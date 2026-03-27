@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: concierge-booking-bot
+
+  # --- High-Performance Concurrency (Java 21) ---
+  threads:
+    virtual:
+      enabled: true
+  
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always # This is key to seeing the 'OPEN' status
+
+resilience4j:
+  retry:
+    instances:
+      kafkaProducerRetry:
+        maxAttempts: 3
+        waitDuration: 2s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.io.IOException
+          - org.apache.kafka.common.errors.TimeoutException
+  circuitbreaker:
+    instances:
+      kafkaProducer:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+    configs:
+      default:
+        registerHealthIndicator: true # Connects R4J to Actuator
+
+
+  kafka:
+    #This is the "Nuclear Option" to stop SCRAM/SASL errors
+    properties:
+      security.protocol: PLAINTEXT
+      max.block.ms: 2000
+      delivery.timeout.ms: 3000
+    producer:
+      # Matches your internal Docker service name
+      bootstrap-servers: broker:29092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # Reliability settings for your self-healing project
+      acks: all
+      retries: 0
+
+  # --- Database Connection (PostgreSQL) ---
+  datasource:
+    url: jdbc:postgresql://localhost:5432/concierge_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # --- Flyway Migration Settings ---
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # --- Hibernate & JPA Settings ---
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+# --- Server Port ---
+server:
+  port: 8080
