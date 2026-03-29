@@ -35,6 +35,7 @@ public class ChatProducerService {
 
     public void kafkaFallback(String message, Throwable t) {
         // 3. ONLY save to the DB here
+        System.out.println("Fallback Triggered! Reason: "+t.getMessage());
         System.out.println("🛡️ Fallback: Saving to Postgres to prevent data loss.");
         FailedMessage failed = new FailedMessage();
         failed.setPayload(message);
