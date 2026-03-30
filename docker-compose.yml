@@ -16,6 +16,9 @@ services:
     volumes:
       # Map your local SQL file to the magic init folder
       - ./sql-init:/docker-entrypoint-initdb.d
+    networks:
+      - concierge-net
+
 
   broker:
     image: confluentinc/cp-kafka:7.5.0
@@ -39,6 +42,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - concierge-net
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: concierge-kafdrop
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "concierge-broker:29092" # Points to your Kafka container
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+    depends_on:
+      - broker
+    networks:
+      - concierge-net
 
   backend:
     build: ./backend
@@ -53,6 +73,8 @@ services:
         condition: service_healthy
       broker:
         condition: service_healthy
+    networks:
+      - concierge-net
 
   frontend:
     build:
@@ -65,3 +87,8 @@ services:
       - /app/node_modules
     environment:
       - VITE_API_URL=http://localhost:8080
+    networks:
+      - concierge-net
+networks:
+  concierge-net:
+    driver: bridge

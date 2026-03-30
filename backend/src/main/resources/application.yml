@@ -1,9 +1,6 @@
 spring:
   application:
     name: concierge-booking-bot
-  threads:
-    virtual:
-      enabled: true
   datasource:
     # Use the service name 'postgres' defined in your docker-compose.yml
     url: jdbc:postgresql://postgres:5432/concierge_db
@@ -12,7 +9,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     # This helps Spring Boot retry the connection a few times on startup
     hikari:
-      initialization-fail-timeout: 30000
+      initialization-fail-timeout: 3000
 
   jpa:
     # Change 'validate' to 'none' temporarily to see if it boots,
@@ -29,16 +26,16 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: broker:29092
-    properties:
-      security.protocol: PLAINTEXT
-      # Increased for Docker network stabilization
-      max.block.ms: 15000
-      delivery.timeout.ms: 8000
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      acks: all
-      retries: 3
+      properties:
+        security.protocol: PLAINTEXT
+#        linger.ms: 0
+#        delivery.timeout.ms: 20000
+#        request.timeout.ms: 1500
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        acks: all
+        retries: 3
 
   resilience4j:
     retry:

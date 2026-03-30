@@ -26,7 +26,7 @@ public class ChatProducerService {
     public void sendMessage(String message) {
         try {
             // Use .get(5, TimeUnit.SECONDS) to ensure we don't hang forever
-            kafkaTemplate.send(TOPIC, message).get(5, java.util.concurrent.TimeUnit.SECONDS);
+            kafkaTemplate.send(TOPIC, message).get(10, java.util.concurrent.TimeUnit.SECONDS);
         } catch (Exception e) {
             // We THROW the error so Resilience4j knows it failed
             throw new RuntimeException("Kafka unreachable", e);
