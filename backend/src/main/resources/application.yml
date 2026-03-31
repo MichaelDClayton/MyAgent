@@ -1,6 +1,7 @@
 spring:
   application:
     name: concierge-booking-bot
+
   datasource:
     # Use the service name 'postgres' defined in your docker-compose.yml
     url: jdbc:postgresql://postgres:5432/concierge_db
@@ -71,3 +72,8 @@ management:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
+
+jwt:
+  secret: ${jwt_SECRET:8KnHn1uoVVuiUT+32bYdENQpF9fmvWBd3bc4UuT03H8=}
+  issuer: concierge-app
+  expiration-ms: 3600000 # 1 Hour

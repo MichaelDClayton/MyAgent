@@ -20,3 +20,8 @@ VOLUME /tmp
 RUN mkdir -p /uploads
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Security:
+# 1. add a non root user
+RUN useradd -m concierge
+USER concierge
