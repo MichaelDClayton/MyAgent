@@ -29,7 +29,9 @@ public class MessageRecoveryScheduler {
     @Scheduled(fixedDelay = 30000) // Runs every 30 seconds
     public void retryFailedMessages() {
         // Only attempt recovery if the "Door is Closed" (Kafka is Healthy)
-        if (kafkaCircuitBreaker.getState() == CircuitBreaker.State.CLOSED) {
+        if (kafkaCircuitBreaker.getState() == CircuitBreaker.State.CLOSED ||
+            kafkaCircuitBreaker.getState() == CircuitBreaker.State.HALF_OPEN) {
+
             List<FailedMessage> pending = repository.findByStatus("PENDING_RETRY");
             
             if (!pending.isEmpty()) {
