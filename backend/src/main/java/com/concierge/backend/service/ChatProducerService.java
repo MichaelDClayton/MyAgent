@@ -15,9 +15,8 @@ import java.time.Instant;
 
 @Service
 public class ChatProducerService {
-    private final FailedMessageRepository failedMessageRepository;
 
-    //private final KafkaTemplate<String, String> kafkaTemplate;
+    private final FailedMessageRepository failedMessageRepository;
     private final KafkaTemplate<String, ChatRequest> kafkaTemplate;
     private static final String TOPIC = "bookings";
 
@@ -25,18 +24,6 @@ public class ChatProducerService {
         this.kafkaTemplate = kafkaTemplate;
         this.failedMessageRepository = failedMessageRepository;
     }
-
-   /* @Retry(name = "kafkaProducerRetry") // 1. Try a few times
-    @CircuitBreaker(name = "kafkaProducer", fallbackMethod = "kafkaFallback") // 2. If it still fails, trip the breaker
-    public void sendMessage(String message) {
-        try {
-            // Use .get(5, TimeUnit.SECONDS) to ensure we don't hang forever
-            kafkaTemplate.send(TOPIC, message).get(10, java.util.concurrent.TimeUnit.SECONDS);
-        } catch (Exception e) {
-            // We THROW the error so Resilience4j knows it failed
-            throw new RuntimeException("Kafka unreachable", e);
-        }
-    }*/
 
     @Retry(name = "kafkaProducerRetry") // 1. Try a few times
     @CircuitBreaker(name = "kafkaProducer", fallbackMethod = "kafkaFallback") // 2. If it still fails, trip the breaker
