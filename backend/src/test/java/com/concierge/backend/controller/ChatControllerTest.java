@@ -31,6 +31,7 @@ public class ChatControllerTest {
     private ChatResponse testChatResponse = new  ChatResponse("Message received and queued for processing!");
     @MockitoBean
     private ChatRequest testChatRequest = new ChatRequest("Hello World!");
+
     @BeforeEach
     void setUp() {
         // Manually bind the WebTestClient to MockMvc
@@ -42,6 +43,7 @@ public class ChatControllerTest {
         doNothing().when(chatProducerService).sendMessage(anyString());
            webTestClient.post()
                    .uri("/api/chat")
+                   .header("Accept","application/json")
                    .bodyValue(testChatRequest)
                    .exchange()
                    .expectStatus().isOk();
@@ -51,6 +53,7 @@ public class ChatControllerTest {
     void testChatController_assert_response(){
         webTestClient.post()
                 .uri("/api/chat")
+                .header("Accept","application/json")
                 .bodyValue(testChatRequest)
                 .exchange()
                 .expectStatus().isOk()
