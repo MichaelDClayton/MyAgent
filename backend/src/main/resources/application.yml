@@ -36,7 +36,6 @@ spring:
       properties:
         spring.json.add.type.headers: true
       consumer:
-        bootstrap-servers: broker:29092
         group-id: concierge-group
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
