@@ -26,7 +26,9 @@ public class FileUploadController {
         }
         try{
             String fileName = file.getOriginalFilename();
+            assert fileName != null;
             String cleanName = StringUtils.cleanPath(fileName);
+            System.out.println("Cleaned Filename: "+cleanName);
             long fileSize = file.getSize();
             //Move file to uploads directory
             Files.copy(file.getInputStream(), this.root.resolve(Objects.requireNonNull(cleanName)));

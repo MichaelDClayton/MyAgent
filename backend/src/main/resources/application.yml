@@ -73,7 +73,6 @@ management:
       max-file-size: 5MB
       max-request-size: 10MB
 
-jwt:
-  secret: ${jwt_SECRET:8KnHn1uoVVuiUT+32bYdENQpF9fmvWBd3bc4UuT03H8=}
-  issuer: concierge-app
-  expiration-ms: 3600000 # 1 Hour
+logging:
+  level:
+    org.springframework.web.servlet.handler.HandlerMappingIntrospector: OFF

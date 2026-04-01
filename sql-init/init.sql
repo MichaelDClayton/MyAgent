@@ -1,7 +1,6 @@
 -- Create failed_messages table
 CREATE TABLE IF NOT EXISTS failed_messages (
     id BIGSERIAL PRIMARY KEY,
-    tenant_id FOREIGN KEY
     payload TEXT NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING_RETRY',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
