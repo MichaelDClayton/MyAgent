@@ -15,8 +15,15 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+
 # Create volume for file uploads
 VOLUME /tmp
 RUN mkdir -p /uploads
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Security:
+# 1. add a non root user
+RUN useradd -m concierge
+USER concierge

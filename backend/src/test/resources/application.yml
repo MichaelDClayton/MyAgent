@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: concierge-booking-bot
+
+  resilience4j:
+    retry:
+      instances:
+        kafkaProducerRetry:
+          maxAttempts: 3
+          waitDuration: 2s
+    circuitbreaker:
+      instances:
+        kafkaProducer:
+          registerHealthIndicator: true
+          slidingWindowSize: 10
+          minimumNumberOfCalls: 5
+          waitDurationInOpenState: 15s
+          failureRateThreshold: 50
+
+
