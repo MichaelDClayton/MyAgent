@@ -28,15 +28,24 @@ spring:
   kafka:
     bootstrap-servers: broker:29092
     producer:
+      security.protocol: PLAINTEXT
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      acks: all
+      retries: 3
       properties:
-        security.protocol: PLAINTEXT
-#        linger.ms: 0
-#        delivery.timeout.ms: 20000
-#        request.timeout.ms: 1500
-        key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: org.apache.kafka.common.serialization.StringSerializer
-        acks: all
-        retries: 3
+        spring.json.add.type.headers: true
+      consumer:
+        bootstrap-servers: broker:29092
+        group-id: concierge-group
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+        properties:
+          # Trust your model package to allow object creation
+          spring.json.trusted.packages: "com.concierge.backend.model"
+          # Match the producer's mapping: "alias:FullClassName"
+          spring.json.type.mapping: "chat:com.concierge.backend.model.ChatRequest"
 
   resilience4j:
     retry:

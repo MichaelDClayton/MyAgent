@@ -1,5 +1,6 @@
 package com.concierge.backend.service;
 
+import com.concierge.backend.model.ChatRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -9,24 +10,40 @@ import com.concierge.backend.repository.FailedMessageRepository;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+
+import java.time.Instant;
+
 @Service
 public class ChatProducerService {
-    @Autowired
-    private FailedMessageRepository repository;
+    private final FailedMessageRepository failedMessageRepository;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    //private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, ChatRequest> kafkaTemplate;
     private static final String TOPIC = "bookings";
 
-    public ChatProducerService(KafkaTemplate<String, String> kafkaTemplate) {
+    public ChatProducerService(KafkaTemplate<String, ChatRequest> kafkaTemplate, FailedMessageRepository failedMessageRepository) {
         this.kafkaTemplate = kafkaTemplate;
+        this.failedMessageRepository = failedMessageRepository;
     }
+
+   /* @Retry(name = "kafkaProducerRetry") // 1. Try a few times
+    @CircuitBreaker(name = "kafkaProducer", fallbackMethod = "kafkaFallback") // 2. If it still fails, trip the breaker
+    public void sendMessage(String message) {
+        try {
+            // Use .get(5, TimeUnit.SECONDS) to ensure we don't hang forever
+            kafkaTemplate.send(TOPIC, message).get(10, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (Exception e) {
+            // We THROW the error so Resilience4j knows it failed
+            throw new RuntimeException("Kafka unreachable", e);
+        }
+    }*/
 
     @Retry(name = "kafkaProducerRetry") // 1. Try a few times
     @CircuitBreaker(name = "kafkaProducer", fallbackMethod = "kafkaFallback") // 2. If it still fails, trip the breaker
     public void sendMessage(String message) {
         try {
             // Use .get(5, TimeUnit.SECONDS) to ensure we don't hang forever
-            kafkaTemplate.send(TOPIC, message).get(10, java.util.concurrent.TimeUnit.SECONDS);
+            kafkaTemplate.send(TOPIC, new ChatRequest(message)).get(10, java.util.concurrent.TimeUnit.SECONDS);
         } catch (Exception e) {
             // We THROW the error so Resilience4j knows it failed
             throw new RuntimeException("Kafka unreachable", e);
@@ -40,6 +57,6 @@ public class ChatProducerService {
         FailedMessage failed = new FailedMessage();
         failed.setPayload(message);
         failed.setStatus("PENDING_RETRY");
-        repository.save(failed);
+        failedMessageRepository.save(failed);
     }
 }
