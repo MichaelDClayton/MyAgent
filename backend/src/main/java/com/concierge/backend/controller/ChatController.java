@@ -1,5 +1,6 @@
 package com.concierge.backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class ChatController {
     }
 
     @PostMapping("/chat")
-    public ChatResponse handleChat(@RequestBody ChatRequest request) {
+    public ChatResponse handleChat(@Valid @RequestBody ChatRequest request) {
 
         // 1. Send to Kafka (Self-Healing Pipeline Entry)
         producerService.sendMessage(request.message());
