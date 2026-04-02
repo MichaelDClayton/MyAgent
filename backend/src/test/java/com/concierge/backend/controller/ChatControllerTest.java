@@ -26,16 +26,15 @@ public class ChatControllerTest {
 
     @MockitoBean
     private ChatProducerService chatProducerService;
-
-    @MockitoBean
-    private ChatResponse testChatResponse = new  ChatResponse("Message received and queued for processing!");
-    @MockitoBean
-    private ChatRequest testChatRequest = new ChatRequest("Hello World!");
+    private ChatRequest testChatRequest;
 
     @BeforeEach
     void setUp() {
         // Manually bind the WebTestClient to MockMvc
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build();
+        ChatResponse testChatResponse = new ChatResponse("Message received and queued for processing!");
+        testChatRequest = new ChatRequest("Hello World!");
+
     }
 
     @Test
