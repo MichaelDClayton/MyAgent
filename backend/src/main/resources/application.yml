@@ -1,6 +1,16 @@
 spring:
+
   application:
     name: concierge-booking-bot
+  cache:
+    type: redis
+  data:
+    redis:
+      host: redis
+      port: 6379
+      repositories:
+        enabled: false
+
 
   datasource:
     # Use the service name 'postgres' defined in your docker-compose.yml
@@ -61,11 +71,12 @@ spring:
           waitDurationInOpenState: 15s
           failureRateThreshold: 50
 
+
 management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,circuitbreakers" #
+        include: "health,info,metrics,circuitbreakers,caches" #
   health:
     circuitbreakers:
       enabled: true
@@ -83,4 +94,5 @@ management:
 
 logging:
   level:
-    org.springframework.web.servlet.handler.HandlerMappingIntrospector: OFF
+    - org.springframework.web.servlet.handler.HandlerMappingIntrospector: OFF
+    - org.springframework.cache: TRACE
