@@ -1,7 +1,6 @@
 package com.concierge.backend.service;
 
 import com.concierge.backend.model.ChatRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +9,6 @@ import com.concierge.backend.repository.FailedMessageRepository;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-
-import java.time.Instant;
 
 @Service
 public class ChatProducerService {
